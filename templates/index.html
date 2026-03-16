@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Analyzer — LinkedIn & Instagram AI Insights</title>
+    <meta name="description" content="Analyze your LinkedIn or Instagram profile with AI. Get actionable insights on strengths, weaknesses, and recommendations to boost your professional and social brand.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* LinkedIn palette */
+            --li-primary: #0a66c2;
+            --li-dark: #004182;
+            --li-light: #e8f4fd;
+            --li-glow: rgba(10,102,194,0.25);
+
+            /* Instagram palette */
+            --ig-pink: #E1306C;
+            --ig-purple: #833AB4;
+            --ig-orange: #F77737;
+            --ig-gradient: linear-gradient(135deg, #833AB4, #E1306C, #F77737);
+            --ig-light: #fdf0f5;
+            --ig-glow: rgba(225,48,108,0.25);
+
+            /* Neutral */
+            --bg: #f0f4ff;
+            --card: #ffffff;
+            --text: #1a1a2e;
+            --text-muted: #666;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --danger: #dc2626;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(180deg, var(--bg) 0%, #e8edf8 40%, #f5f7fa 100%);
+            min-height: 100vh;
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            background: rgba(255,255,255,0.82);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            position: sticky; top: 0; z-index: 100;
+            padding: 0 32px;
+        }
+        .navbar-inner {
+            max-width: 1100px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 64px;
+        }
+        .nav-brand {
+            display: flex; align-items: center; gap: 10px;
+            font-weight: 700; font-size: 1.15rem; color: var(--li-primary); font-family: 'Outfit', sans-serif;
+            text-decoration: none;
+        }
+        .nav-brand svg { flex-shrink: 0; }
+        .nav-links { display: flex; align-items: center; gap: 28px; }
+        .nav-links a {
+            color: #555; text-decoration: none; font-size: 0.9rem; font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--li-primary); }
+        .nav-cta {
+            background: var(--li-primary); color: #fff !important;
+            padding: 8px 22px; border-radius: 8px; font-weight: 600 !important;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .nav-cta:hover { background: var(--li-dark) !important; transform: translateY(-1px); }
+
+        /* ── Hero ── */
+        .hero { text-align: center; padding: 64px 24px 36px; }
+        .hero-icon {
+            width: 72px; height: 72px; border-radius: 20px;
+            display: inline-flex; align-items: center; justify-content: center;
+            margin-bottom: 22px;
+            box-shadow: 0 8px 32px var(--li-glow);
+            animation: float 3s ease-in-out infinite;
+            transition: background 0.5s, box-shadow 0.5s;
+        }
+        .hero-icon.linkedin { background: linear-gradient(135deg, #0a66c2, #0050a0); box-shadow: 0 8px 32px var(--li-glow); }
+        .hero-icon.instagram { background: var(--ig-gradient); box-shadow: 0 8px 32px var(--ig-glow); }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 10px;
+            transition: color 0.4s;
+        }
+        .hero h1 .brand-word { transition: color 0.4s; }
+        .hero h1 .brand-word.linkedin { color: var(--li-primary); }
+        .hero h1 .brand-word.instagram { background: var(--ig-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-sub {
+            font-size: 1.1rem; color: var(--text-muted); max-width: 540px;
+            margin: 0 auto; line-height: 1.6;
+        }
+
+        /* ── Platform Tabs ── */
+        .platform-tabs {
+            display: flex; justify-content: center; gap: 8px;
+            margin: 0 auto 28px; max-width: 420px;
+        }
+        .tab-btn {
+            flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 14px 20px; border-radius: 14px; border: 2px solid var(--border);
+            background: var(--card); cursor: pointer; font-family: 'Inter', sans-serif;
+            font-size: 0.95rem; font-weight: 600; color: var(--text-muted); font-family: 'Outfit', sans-serif;
+            transition: all 0.3s;
+        }
+        .tab-btn:hover { border-color: #ccc; }
+        .tab-btn.active.linkedin {
+            border-color: var(--li-primary); color: var(--li-primary);
+            background: var(--li-light); box-shadow: 0 4px 16px var(--li-glow);
+        }
+        .tab-btn.active.instagram {
+            border-color: var(--ig-pink); color: var(--ig-pink);
+            background: var(--ig-light); box-shadow: 0 4px 16px var(--ig-glow);
+        }
+        .tab-btn svg { flex-shrink: 0; }
+
+        /* ── Info Banner ── */
+        .info-banner {
+            max-width: 720px; margin: 0 auto 28px;
+            border-radius: 14px; padding: 18px 24px;
+            display: flex; align-items: flex-start; gap: 14px;
+            animation: slideUp 0.5s ease-out 0.2s both;
+            transition: background 0.4s, border-color 0.4s;
+        }
+        .info-banner.linkedin {
+            background: linear-gradient(135deg, #e8f4fd, #dbeeff);
+            border: 1px solid #b6d8f7;
+        }
+        .info-banner.instagram {
+            background: linear-gradient(135deg, #fdf0f5, #fce4ec);
+            border: 1px solid #f3b4c9;
+        }
+        .info-banner svg { flex-shrink: 0; margin-top: 2px; }
+        .info-banner p { font-size: 0.92rem; line-height: 1.65; }
+        .info-banner.linkedin p { color: #1a5276; }
+        .info-banner.linkedin strong { color: var(--li-primary); }
+        .info-banner.instagram p { color: #5c1a3a; }
+        .info-banner.instagram strong { color: var(--ig-pink); }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Search Card ── */
+        .search-card {
+            max-width: 720px; margin: 0 auto 50px;
+            background: var(--card); border-radius: 18px;
+            padding: 32px 36px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+            animation: slideUp 0.5s ease-out 0.35s both;
+        }
+        .search-card label {
+            display: block; font-weight: 600; font-size: 0.95rem; color: #333;
+            margin-bottom: 12px; transition: color 0.3s;
+        }
+        .search-row { display: flex; gap: 12px; align-items: stretch; }
+        .search-input {
+            flex: 1; padding: 16px 22px; border: 2px solid var(--border);
+            border-radius: 12px; font-size: 15px; font-family: 'DM Sans', sans-serif;
+            transition: all 0.25s; outline: none; background: #f8fafc; color: var(--text);
+        }
+        .search-input::placeholder { color: #a0aec0; }
+        .search-input:focus.linkedin {
+            border-color: var(--li-primary); box-shadow: 0 0 0 4px rgba(10,102,194,0.12);
+        }
+        .search-input:focus.instagram {
+            border-color: var(--ig-pink); box-shadow: 0 0 0 4px rgba(225,48,108,0.12);
+        }
+        .search-input:focus { background: #fff; }
+
+        .search-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: #fff; border: none; padding: 16px 32px;
+            border-radius: 12px; font-size: 15px; font-weight: 600; font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.25s; white-space: nowrap;
+        }
+        .search-btn.linkedin {
+            background: linear-gradient(135deg, #0a66c2, #004182);
+            box-shadow: 0 4px 14px var(--li-glow);
+        }
+        .search-btn.linkedin:hover {
+            background: linear-gradient(135deg, #084e96, #003060);
+            transform: translateY(-2px); box-shadow: 0 6px 22px var(--li-glow);
+        }
+        .search-btn.instagram {
+            background: var(--ig-gradient);
+            box-shadow: 0 4px 14px var(--ig-glow);
+        }
+        .search-btn.instagram:hover {
+            filter: brightness(1.1); transform: translateY(-2px);
+            box-shadow: 0 6px 22px var(--ig-glow);
+        }
+        .search-btn:active { transform: translateY(0); }
+        .search-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important; box-shadow: none; }
+        .search-btn svg { flex-shrink: 0; }
+
+        /* ── Loading ── */
+        .loading-overlay {
+            display: none; max-width: 720px; margin: 0 auto 30px;
+            text-align: center; padding: 48px 30px; background: var(--card);
+            border-radius: 18px; box-shadow: 0 4px 30px rgba(0,0,0,0.07);
+        }
+        .loading-overlay.show { display: block; animation: slideUp 0.4s ease-out; }
+        .pulse-ring {
+            width: 56px; height: 56px; border: 3px solid var(--border);
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+            margin: 0 auto 18px; transition: border-top-color 0.4s;
+        }
+        .pulse-ring.linkedin { border-top-color: var(--li-primary); }
+        .pulse-ring.instagram { border-top-color: var(--ig-pink); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-overlay p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* ── Error ── */
+        .error-banner {
+            display: none; max-width: 720px; margin: 0 auto 20px;
+            background: #fff5f5; border: 1px solid #feb2b2; color: #c53030;
+            border-radius: 12px; padding: 16px 22px; font-size: 0.92rem;
+        }
+        .error-banner.show { display: block; animation: slideUp 0.35s ease-out; }
+
+        /* ── Results ── */
+        .results-wrapper {
+            max-width: 780px; margin: 0 auto 60px; padding: 0 24px; display: none;
+        }
+        .results-wrapper.show { display: block; animation: slideUp 0.5s ease-out; }
+        .results-card {
+            background: var(--card); border-radius: 20px; padding: 44px 40px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .results-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 36px; padding-bottom: 24px; border-bottom: 2px solid #f0f2f5;
+        }
+        .results-header h2 { font-family: 'Outfit', sans-serif; font-size: 1.75rem; font-weight: 800; color: var(--text); }
+        .rating-pill {
+            display: flex; align-items: center; gap: 6px; color: #fff;
+            padding: 10px 26px; border-radius: 50px; font-weight: 700; font-size: 1.1rem; font-family: 'Outfit', sans-serif;
+            transition: background 0.4s, box-shadow 0.4s;
+        }
+        .rating-pill.linkedin { background: linear-gradient(135deg, #0a66c2, #004182); box-shadow: 0 4px 14px var(--li-glow); }
+        .rating-pill.instagram { background: var(--ig-gradient); box-shadow: 0 4px 14px var(--ig-glow); }
+        .rating-pill svg { flex-shrink: 0; }
+
+        .section-block { margin-bottom: 28px; }
+        .section-block:last-child { margin-bottom: 0; }
+        .section-label {
+            display: flex; align-items: center; gap: 10px;
+            font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 14px;
+        }
+        .section-label.strengths { color: var(--success); }
+        .section-label.weaknesses { color: var(--danger); }
+        .section-label.suggestions.linkedin { color: var(--li-primary); }
+        .section-label.suggestions.instagram { color: var(--ig-purple); }
+
+        .section-list { list-style: none; padding: 0; }
+        .section-list li {
+            padding: 14px 20px; margin-bottom: 10px; border-radius: 12px;
+            border-left: 4px solid; font-size: 0.93rem; line-height: 1.7;
+            transition: transform 0.15s;
+        }
+        .section-list li:hover { transform: translateX(4px); }
+        .str-block .section-list li { background: #f0fdf4; border-left-color: var(--success); }
+        .weak-block .section-list li { background: #fef2f2; border-left-color: var(--danger); }
+        .sug-block.linkedin .section-list li { background: #eff6ff; border-left-color: var(--li-primary); }
+        .sug-block.instagram .section-list li { background: #fdf0f5; border-left-color: var(--ig-purple); }
+
+        /* ── Features ── */
+        .features { max-width: 900px; margin: 0 auto 70px; padding: 0 24px; }
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .feature-card {
+            background: var(--card); border-radius: 16px; padding: 36px 28px;
+            text-align: center; box-shadow: 0 2px 14px rgba(0,0,0,0.05);
+            transition: transform 0.25s, box-shadow 0.25s;
+            animation: slideUp 0.5s ease-out both;
+        }
+        .feature-card:nth-child(1) { animation-delay: 0.45s; }
+        .feature-card:nth-child(2) { animation-delay: 0.55s; }
+        .feature-card:nth-child(3) { animation-delay: 0.65s; }
+        .feature-card:hover { transform: translateY(-6px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+        .feature-icon {
+            width: 56px; height: 56px; border-radius: 16px;
+            display: inline-flex; align-items: center; justify-content: center;
+            margin-bottom: 18px;
+        }
+        .feature-icon.blue { background: linear-gradient(135deg, #e8f4fd, #cce5ff); }
+        .feature-icon.green { background: linear-gradient(135deg, #e6f9ee, #c8f0d8); }
+        .feature-icon.purple { background: linear-gradient(135deg, #f0e6ff, #dccfff); }
+        .feature-card h3 { font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+        .feature-card p { font-size: 0.88rem; color: #777; line-height: 1.55; }
+
+        /* ── Footer ── */
+        .footer {
+            text-align: center; padding: 32px 24px; color: #999;
+            font-size: 0.82rem; border-top: 1px solid #e8ecf0;
+        }
+        .footer a { color: var(--li-primary); text-decoration: none; }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .features-grid { grid-template-columns: 1fr; }
+            .search-row { flex-direction: column; }
+            .search-btn { width: 100%; justify-content: center; }
+            .results-card { padding: 28px 22px; }
+            .results-header { flex-direction: column; gap: 14px; align-items: flex-start; }
+            .nav-links { display: none; }
+            .platform-tabs { max-width: 100%; padding: 0 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ─── Navbar ─── -->
+    <nav class="navbar" id="navbar">
+        <div class="navbar-inner">
+            <a href="/" class="nav-brand">
+                <svg width="32" height="32" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="64" height="64" rx="14" fill="url(#navLogoGrad)"/>
+                    <circle cx="26" cy="22" r="7" fill="#fff"/>
+                    <path d="M14 44c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none"/>
+                    <circle cx="42" cy="36" r="7" stroke="#fff" stroke-width="3" fill="none"/>
+                    <line x1="47" y1="41" x2="54" y2="48" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="navLogoGrad" x1="0" y1="0" x2="64" y2="64">
+                            <stop offset="0%" stop-color="#0a66c2"/>
+                            <stop offset="100%" stop-color="#833AB4"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                Profile Analyzer
+            </a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#" class="nav-cta">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ─── Hero ─── -->
+    <section class="hero">
+        <div class="hero-icon linkedin" id="heroIcon">
+            <svg id="heroSvg" width="36" height="36" fill="none" viewBox="0 0 24 24">
+                <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#fff"/>
+            </svg>
+        </div>
+        <h1><span class="brand-word linkedin" id="brandWord">LinkedIn</span> <span>Analyzer</span></h1>
+        <p class="hero-sub" id="heroSub">Get AI-powered insights to strengthen your LinkedIn profile and boost your professional brand</p>
+    </section>
+
+    <!-- ─── Platform Tabs ─── -->
+    <div class="platform-tabs">
+        <button class="tab-btn active linkedin" id="tabLinkedIn" onclick="switchPlatform('linkedin')">
+            <svg width="20" height="20" viewBox="0 0 72 72" fill="none">
+                <rect width="72" height="72" rx="14" fill="#0a66c2"/>
+                <path d="M22 30h7v20h-7V30zm3.5-10a4 4 0 110 8 4 4 0 010-8zM34 30h6.7v2.7h.1c.9-1.8 3.2-3.6 6.6-3.6 7.1 0 8.4 4.7 8.4 10.7V50h-7V41.3c0-2.1 0-4.7-2.9-4.7-2.9 0-3.3 2.2-3.3 4.5V50H36V30h-2z" fill="#fff"/>
+            </svg>
+            LinkedIn
+        </button>
+        <button class="tab-btn instagram" id="tabInstagram" onclick="switchPlatform('instagram')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <defs>
+                    <linearGradient id="igGrad" x1="0" y1="24" x2="24" y2="0">
+                        <stop offset="0%" stop-color="#F77737"/>
+                        <stop offset="50%" stop-color="#E1306C"/>
+                        <stop offset="100%" stop-color="#833AB4"/>
+                    </linearGradient>
+                </defs>
+                <rect x="2" y="2" width="20" height="20" rx="5" stroke="url(#igGrad)" stroke-width="2" fill="none"/>
+                <circle cx="12" cy="12" r="5" stroke="url(#igGrad)" stroke-width="2" fill="none"/>
+                <circle cx="17.5" cy="6.5" r="1.5" fill="url(#igGrad)"/>
+            </svg>
+            Instagram
+        </button>
+    </div>
+
+    <!-- ─── Info Banner ─── -->
+    <div class="info-banner linkedin" id="infoBanner">
+        <svg width="22" height="22" id="infoIcon" fill="#0a66c2" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <p id="infoText"><strong>How it works:</strong> Paste your LinkedIn profile URL below and click "Analyze Profile". Our AI will evaluate your headline, summary, experience, and skills, then provide a detailed rating with actionable recommendations.</p>
+    </div>
+
+    <!-- ─── Search Card ─── -->
+    <div class="search-card" id="searchCard">
+        <label for="urlInput" id="searchLabel">Enter your LinkedIn Profile URL</label>
+        <div class="search-row">
+            <input
+                type="url"
+                id="urlInput"
+                class="search-input linkedin"
+                placeholder="https://linkedin.com/in/yourname"
+                autocomplete="off"
+            />
+            <button class="search-btn linkedin" id="analyzeBtn" onclick="handleAnalyze()">
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#fff"/></svg>
+                <span id="btnText">Analyze Profile</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ─── Loading ─── -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="pulse-ring linkedin" id="loadingRing"></div>
+        <p id="loadingText">Analyzing your profile — this may take a moment…</p>
+    </div>
+
+    <!-- ─── Error Banner ─── -->
+    <div class="error-banner" id="errorBanner"></div>
+
+    <!-- ─── Results ─── -->
+    <div class="results-wrapper" id="resultsWrapper">
+        <div class="results-card">
+            <div class="results-header">
+                <h2 id="resultsTitle">Analysis Results</h2>
+                <div class="rating-pill linkedin" id="ratingPill">
+                    <svg width="18" height="18" fill="#fff" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    <span id="ratingValue">--/10</span>
+                </div>
+            </div>
+
+            <div class="section-block str-block" id="strengthsBlock">
+                <div class="section-label strengths">
+                    <svg width="20" height="20" fill="#16a34a" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    Strengths
+                </div>
+                <ul class="section-list" id="strengthsList"></ul>
+            </div>
+
+            <div class="section-block weak-block" id="weaknessesBlock">
+                <div class="section-label weaknesses">
+                    <svg width="20" height="20" fill="#dc2626" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                    Areas for Improvement
+                </div>
+                <ul class="section-list" id="weaknessesList"></ul>
+            </div>
+
+            <div class="section-block sug-block linkedin" id="suggestionsBlock">
+                <div class="section-label suggestions linkedin" id="sugLabel">
+                    <svg width="20" height="20" id="sugIcon" fill="#0a66c2" viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>
+                    Recommendations
+                </div>
+                <ul class="section-list" id="suggestionsList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Features ─── -->
+    <section class="features" id="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon blue">
+                    <svg width="26" height="26" fill="#0a66c2" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                </div>
+                <h3>AI-Powered Analysis</h3>
+                <p>Powered by Google Gemini AI for deep, context-aware profile evaluation</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon green">
+                    <svg width="26" height="26" fill="#16a34a" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <h3>Actionable Insights</h3>
+                <p>Get specific strengths, weakness areas, and tailored improvement tips</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon purple">
+                    <svg width="26" height="26" fill="#7c3aed" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                </div>
+                <h3>Multi-Platform</h3>
+                <p>Analyze both LinkedIn and Instagram profiles from a single dashboard</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── Footer ─── -->
+    <footer class="footer">
+        <p>&copy; 2026 Profile Analyzer &middot; Built with <a href="#">Gemini AI</a></p>
+    </footer>
+
+    <!-- ─── Scripts ─── -->
+    <script>
+        let currentPlatform = 'linkedin';
+
+        // ── DOM refs ──
+        const urlInput     = document.getElementById('urlInput');
+        const analyzeBtn   = document.getElementById('analyzeBtn');
+        const btnText      = document.getElementById('btnText');
+        const loadingEl    = document.getElementById('loadingOverlay');
+        const errorEl      = document.getElementById('errorBanner');
+        const resultsEl    = document.getElementById('resultsWrapper');
+        const heroIcon     = document.getElementById('heroIcon');
+        const brandWord    = document.getElementById('brandWord');
+        const heroSub      = document.getElementById('heroSub');
+        const infoBanner   = document.getElementById('infoBanner');
+        const infoIcon     = document.getElementById('infoIcon');
+        const infoText     = document.getElementById('infoText');
+        const searchLabel  = document.getElementById('searchLabel');
+        const loadingRing  = document.getElementById('loadingRing');
+        const loadingText  = document.getElementById('loadingText');
+        const ratingPill   = document.getElementById('ratingPill');
+        const sugBlock     = document.getElementById('suggestionsBlock');
+        const sugLabel     = document.getElementById('sugLabel');
+        const sugIcon      = document.getElementById('sugIcon');
+        const resultsTitle = document.getElementById('resultsTitle');
+
+        // ── Platform configs ──
+        const platforms = {
+            linkedin: {
+                brandText: 'LinkedIn',
+                heroSub: 'Get AI-powered insights to strengthen your LinkedIn profile and boost your professional brand',
+                infoHtml: '<strong>How it works:</strong> Paste your LinkedIn profile URL below and click "Analyze Profile". Our AI will evaluate your headline, summary, experience, and skills, then provide a detailed rating with actionable recommendations.',
+                infoIconColor: '#0a66c2',
+                label: 'Enter your LinkedIn Profile URL',
+                placeholder: 'https://linkedin.com/in/yourname',
+                btnLabel: 'Analyze Profile',
+                loadingMsg: 'Analyzing your LinkedIn profile…',
+                resultsTitle: 'LinkedIn Analysis Results',
+                sugIconColor: '#0a66c2',
+            },
+            instagram: {
+                brandText: 'Instagram',
+                heroSub: 'Discover how your Instagram presence stacks up and get AI-driven tips to grow your audience',
+                infoHtml: '<strong>How it works:</strong> Paste any Instagram profile URL (e.g. <code>https://instagram.com/cristiano</code>). AI uses Search grounding to fetch public profile data, then generates your full analysis report.',
+                infoIconColor: '#E1306C',
+                label: 'Enter an Instagram Profile URL',
+                placeholder: 'https://www.instagram.com/cristiano/',
+                btnLabel: 'Analyze Profile',
+                loadingMsg: 'Fetching profile data & running analysis — this may take ~15 seconds…',
+                resultsTitle: 'Instagram Analysis Results',
+                sugIconColor: '#833AB4',
+            }
+        };
+
+        function switchPlatform(platform) {
+            currentPlatform = platform;
+            const cfg = platforms[platform];
+            const other = platform === 'linkedin' ? 'instagram' : 'linkedin';
+
+            // Tabs
+            document.getElementById('tabLinkedIn').classList.toggle('active', platform === 'linkedin');
+            document.getElementById('tabLinkedIn').classList.toggle('linkedin', platform === 'linkedin');
+            document.getElementById('tabInstagram').classList.toggle('active', platform === 'instagram');
+            document.getElementById('tabInstagram').classList.toggle('instagram', platform === 'instagram');
+
+            // Hero
+            heroIcon.className = 'hero-icon ' + platform;
+            brandWord.className = 'brand-word ' + platform;
+            brandWord.textContent = cfg.brandText;
+            heroSub.textContent = cfg.heroSub;
+
+            // Info banner
+            infoBanner.className = 'info-banner ' + platform;
+            infoIcon.setAttribute('fill', cfg.infoIconColor);
+            infoText.innerHTML = cfg.infoHtml;
+
+            // Search
+            searchLabel.textContent = cfg.label;
+            urlInput.placeholder = cfg.placeholder;
+            urlInput.className = 'search-input ' + platform;
+            analyzeBtn.className = 'search-btn ' + platform;
+            btnText.textContent = cfg.btnLabel;
+
+            // Loading
+            loadingRing.className = 'pulse-ring ' + platform;
+            loadingText.textContent = cfg.loadingMsg;
+
+            // Results theming
+            ratingPill.className = 'rating-pill ' + platform;
+            sugBlock.className = 'section-block sug-block ' + platform;
+            sugLabel.className = 'section-label suggestions ' + platform;
+            sugIcon.setAttribute('fill', cfg.sugIconColor);
+            resultsTitle.textContent = cfg.resultsTitle;
+
+            // Reset state
+            resultsEl.classList.remove('show');
+            hideError();
+            urlInput.value = '';
+        }
+
+        // ── Helpers ──
+        function showError(msg) { errorEl.textContent = msg; errorEl.classList.add('show'); }
+        function hideError() { errorEl.classList.remove('show'); }
+        function showLoading() { loadingEl.classList.add('show'); }
+        function hideLoading() { loadingEl.classList.remove('show'); }
+
+        function displayResults(data) {
+            document.getElementById('ratingValue').textContent = data.rating ? `${data.rating}/10` : '--/10';
+
+            fillSection('strengthsList', 'strengthsBlock', data.strengths);
+            fillSection('weaknessesList', 'weaknessesBlock', data.weaknesses);
+            fillSection('suggestionsList', 'suggestionsBlock', data.suggestions);
+
+            resultsEl.classList.add('show');
+            resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function fillSection(listId, blockId, items) {
+            const ul = document.getElementById(listId);
+            ul.innerHTML = '';
+            if (items && items.length) {
+                items.forEach(t => {
+                    const li = document.createElement('li');
+                    li.textContent = t.trim();
+                    ul.appendChild(li);
+                });
+                document.getElementById(blockId).style.display = 'block';
+            } else {
+                document.getElementById(blockId).style.display = 'none';
+            }
+        }
+
+        // ── Main handler ──
+        async function handleAnalyze() {
+            const url = urlInput.value.trim();
+            resultsEl.classList.remove('show');
+            hideError();
+
+            if (!url) {
+                showError(`Please enter ${currentPlatform === 'linkedin' ? 'a LinkedIn' : 'an Instagram'} profile URL.`);
+                return;
+            }
+
+            if (currentPlatform === 'linkedin') {
+                if (!/linkedin\.com\/in\/[\w-]+/i.test(url)) {
+                    showError('Please enter a valid LinkedIn profile URL (e.g. https://linkedin.com/in/yourname)');
+                    return;
+                }
+            } else {
+                if (!/instagram\.com\/[A-Za-z0-9_.]+\/?/i.test(url)) {
+                    showError('Please enter a valid Instagram profile URL (e.g. https://www.instagram.com/cristiano/)');
+                    return;
+                }
+            }
+
+            showLoading();
+            analyzeBtn.disabled = true;
+
+            try {
+                let endpoint, body;
+                if (currentPlatform === 'linkedin') {
+                    endpoint = '/analyze';
+                    body = JSON.stringify({ profile_text: url });
+                } else {
+                    endpoint = '/analyze-instagram';
+                    body = JSON.stringify({ profile_url: url });
+                }
+
+                const resp = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body
+                });
+
+                const data = await resp.json();
+                hideLoading();
+                analyzeBtn.disabled = false;
+
+                if (resp.ok && data.success) {
+                    displayResults(data.analysis);
+                } else {
+                    showError(data.error || 'Something went wrong. Please try again.');
+                }
+            } catch (err) {
+                hideLoading();
+                analyzeBtn.disabled = false;
+                showError('Network error — ' + err.message);
+            }
+        }
+
+        // Enter key support
+        urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleAnalyze(); });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                const target = document.querySelector(a.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
